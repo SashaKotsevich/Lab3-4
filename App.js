@@ -27,38 +27,17 @@ export default class App extends React.Component {
       .catch(err => {
         AsyncStorage.getItem("data")
           .then(data => {
-            this.setState({ users: data.json() });
+            if (data) {
+              this.setState({ users: data.json() });
+            } else this.setState({ users: [] });
           })
           .done();
       });
   }
 
-  handleClearButtonPress = () => {
-    AsyncStorage.clear()
-      .then(() => {
-        Alert.alert("Successfully cleared");
-        AsyncStorage.getItem("data")
-          .then(data => {
-            console.log(data);
-          })
-          .done();
-      })
-      .catch(() => {
-        Alert.alert("Something went wrong");
-      });
-  };
-
   render() {
     return (
       <ScrollView>
-        <View
-          style={{
-            paddingTop: 40,
-            backgroundColor: "black"
-          }}
-        >
-          <Button onPress={this.handleClearButtonPress} title="ClearStorage" />
-        </View>
         <View
           style={{
             flex: 1,
@@ -66,7 +45,8 @@ export default class App extends React.Component {
             flexWrap: "wrap",
             backgroundColor: "#fff",
             justifyContent: "space-between",
-            padding: 20
+            padding: 30,
+            backgroundColor: "black"
           }}
         >
           {this.state.users.map(item => {
@@ -95,12 +75,3 @@ export default class App extends React.Component {
     );
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-    alignItems: "center",
-    justifyContent: "center"
-  }
-});

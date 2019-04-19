@@ -1,9 +1,9 @@
 {
   "expo": {
-    "name": "Lab34-0",
+    "name": "Lab2-3",
     "icon": "./assets/icon.png",
     "version": "1.0.0",
-    "slug": "Lab34",
+    "slug": "Lab2-3",
     "sdkVersion": "32.0.0",
     "ios": {
       "bundleIdentifier": "com.yourcompany.yourappname"
