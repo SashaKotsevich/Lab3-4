@@ -7,71 +7,139 @@ import {
   ScrollView,
   AsyncStorage,
   Button,
-  Alert
+  Alert,
+  TouchableHighlight
 } from "react-native";
+import Item from "./compnents/Item";
 
 export default class App extends React.Component {
   state = {
-    users: []
+    data: [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+    isCross: true,
+    gameRun: true,
+    moveCount: 0,
+    lastWin: ""
+  };
+  onCeilPress = (i, j) => {
+    if (this.state.data[i][j] == 0 && this.state.gameRun) {
+      if (this.state.moveCount === 8) {
+        Alert.alert("Draw");
+        this.setState({ gameRun: false, lastWin: "Draw" });
+      } else this.setState({ moveCount: this.state.moveCount + 1 });
+      let data = this.state.data;
+      data[i][j] = this.state.isCross ? 1 : -1;
+      this.setState({ data, isCross: !this.state.isCross });
+      this.winCheck();
+    }
   };
 
-  componentDidMount() {
-    fetch("https://api.github.com/users?per_page=100")
-      .then(data => {
-        return data.json();
-      })
-      .then(data => {
-        this.setState({ users: data });
-        AsyncStorage.setItem("data", JSON.stringify(data));
-      })
-      .catch(err => {
-        AsyncStorage.getItem("data")
-          .then(data => {
-            if (data) {
-              this.setState({ users: data.json() });
-            } else this.setState({ users: [] });
-          })
-          .done();
-      });
-  }
+  winCheck = () => {
+    let winner = 0;
+    const { data } = this.state;
+    for (let i = 0; i < data.length; i++) {
+      if (
+        data[i][0] !== 0 &&
+        data[i][0] === data[i][1] &&
+        data[i][1] === data[i][2]
+      ) {
+        winner = data[i][0];
+      } else if (
+        data[0][i] !== 0 &&
+        data[0][i] === data[1][i] &&
+        data[1][i] === data[2][i]
+      ) {
+        winner = data[0][i];
+      }
+    }
+    if (winner === 0) {
+      if (
+        data[0][0] !== 0 &&
+        data[0][0] == data[1][1] &&
+        data[1][1] == data[(2, 2)]
+      ) {
+        winner = data[0][0];
+      } else if (
+        data[2][0] !== 0 &&
+        data[2][0] == data[1][1] &&
+        data[1][1] == data[0][2]
+      ) {
+        winner = data[2][0];
+      }
+    }
+    if (winner) {
+      let winSym;
+      if (winner === 1) winSym = "X";
+      else winSym = "0";
+      Alert.alert(`${winSym} Win!!!!!`);
+      this.setState({ gameRun: false, lastWin: winSym });
+    }
+  };
+
+  newGame = () => {
+    this.setState({
+      data: [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+      isCross: true,
+      gameRun: true,
+      moveCount: 0
+    });
+  };
 
   render() {
     return (
-      <ScrollView>
+      <View
+        style={{
+          flex: 1,
+          flexDirection: "column",
+          backgroundColor: "black",
+          justifyContent: "center",
+          height: "100%"
+        }}
+      >
+        <Text
+          style={{ backgroundColor: "white", marginBottom: 30, fontSize: 30 }}
+        >{`LastWinner: ${this.state.lastWin}`}</Text>
+        <Button title={"New Game"} onPress={this.newGame} />
         <View
           style={{
-            flex: 1,
+            fle: 1,
             flexDirection: "row",
             flexWrap: "wrap",
-            backgroundColor: "#fff",
-            justifyContent: "space-between",
-            padding: 30,
-            backgroundColor: "black"
+            justifyContent: "center",
+            height: "50%",
+            marginTop: 30
           }}
         >
-          {this.state.users.map(item => {
-            return (
-              <View
-                key={item.id}
-                style={{
-                  width: "40%",
-                  height: "auto",
-                  padding: 10,
-                  backgroundColor: "#aaa",
-                  margin: 10,
-                  borderRadius: 5
-                }}
-              >
-                <Image
-                  source={{ uri: item.avatar_url }}
-                  style={{ width: "100%", height: 100 }}
-                />
-                <Text>{item.login}</Text>
-              </View>
-            );
-          })}
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 0, 0)}>
+            <Item value={this.state.data[0][0]} />
+          </TouchableHighlight>
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 0, 1)}>
+            <Item value={this.state.data[0][1]} />
+          </TouchableHighlight>
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 0, 2)}>
+            <Item value={this.state.data[0][2]} />
+          </TouchableHighlight>
+
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 1, 0)}>
+            <Item value={this.state.data[1][0]} />
+          </TouchableHighlight>
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 1, 1)}>
+            <Item value={this.state.data[1][1]} />
+          </TouchableHighlight>
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 1, 2)}>
+            <Item value={this.state.data[1][2]} />
+          </TouchableHighlight>
+
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 2, 0)}>
+            <Item value={this.state.data[2][0]} />
+          </TouchableHighlight>
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 2, 1)}>
+            <Item value={this.state.data[2][1]} />
+          </TouchableHighlight>
+          <TouchableHighlight onPress={this.onCeilPress.bind(this, 2, 2)}>
+            <Item value={this.state.data[2][2]} />
+          </TouchableHighlight>
         </View>
-      </ScrollView>
+      </View>
     );
   }
 }
